@@ -2,6 +2,7 @@ from os import path
 
 import typer
 from rich.console import Console
+
 from datawatcher.loaders.factory import load_dataset
 
 from datawatcher.core.audit_registry import (
@@ -31,6 +32,63 @@ from datawatcher.audits.structural.schema_consistency_audit import (
 from datawatcher.audits.quality.missing_value_audit import (
     MissingValueAudit
 )
+from datawatcher.audits.quality.duplicate_audit import (
+    DuplicateAudit
+)
+
+from datawatcher.audits.quality.constant_feature_audit import (
+    ConstantFeatureAudit
+)
+
+from datawatcher.audits.quality.near_constant_audit import (
+    NearConstantAudit
+)
+
+from datawatcher.audits.quality.invalid_value_audit import (
+    InvalidValueAudit
+)
+
+from datawatcher.audits.statistical.descriptive_stats_audit import (
+    DescriptiveStatsAudit
+)
+
+from datawatcher.audits.statistical.variance_audit import (
+    VarianceAudit
+)
+from datawatcher.audits.statistical.skewness_audit import (
+    SkewnessAudit
+)
+from datawatcher.audits.statistical.kurtosis_audit import (
+    KurtosisAudit
+)
+from datawatcher.audits.statistical.outlier_audit import (
+    OutlierAudit
+)
+from datawatcher.audits.categorical.category_frequency_audit import (
+    CategoryFrequencyAudit
+)
+from datawatcher.audits.categorical.rare_category_audit import (
+    RareCategoryAudit
+)
+from datawatcher.audits.categorical.category_imbalance_audit import (
+    CategoryImbalanceAudit
+)
+from datawatcher.audits.ml.cardinality_audit import (
+    CardinalityAudit
+)
+from datawatcher.audits.ml.identifier_risk_audit import (
+    IdentifierRiskAudit
+)
+from datawatcher.audits.ml.target_validation_audit import (
+    TargetValidationAudit
+)
+from datawatcher.audits.ml.class_imbalance_audit import (
+    ClassImbalanceAudit
+)
+from datawatcher.audits.ml.leakage_audit import (
+    LeakageAudit
+)   
+
 
 audit_app = typer.Typer()
 
@@ -145,11 +203,84 @@ def run(
     MissingValueAudit()
     )
 
+    registry.register(
+    DuplicateAudit()
+    )
+
+    registry.register(
+    ConstantFeatureAudit()
+    )
+
+    registry.register(
+    NearConstantAudit()
+    )
+
+    registry.register(
+    InvalidValueAudit()
+    )
+
+    registry.register(
+    DescriptiveStatsAudit()
+    )
+
+    registry.register(
+    VarianceAudit()
+    )
+
+    registry.register(
+        SkewnessAudit()
+    )
+
+    registry.register(
+        KurtosisAudit()
+    )
+
+    registry.register(
+        OutlierAudit()
+    )
+
+    registry.register(
+    CategoryFrequencyAudit()
+    )
+
+    registry.register(
+        RareCategoryAudit()
+    )
+
+    registry.register(
+    CategoryImbalanceAudit()
+    )
+
+    registry.register(
+        CardinalityAudit()
+    )
+
+    registry.register(
+        IdentifierRiskAudit()
+    )
+
+    registry.register(
+        TargetValidationAudit()
+    )
+
+    registry.register(
+        ClassImbalanceAudit()
+    )
+    
+    registry.register(
+        LeakageAudit()
+    )
+    
     engine = AuditEngine(
         registry
     )
 
-    results = engine.run(dataset)
+    results = engine.run(
+    dataset,
+    context={
+        "target": target
+    }
+    )
 
     console.print(
     "\n[bold magenta]Audit Results[/bold magenta]"
@@ -176,3 +307,5 @@ def run(
         console.print(
             f"Findings: {result.findings}"
         )
+
+    

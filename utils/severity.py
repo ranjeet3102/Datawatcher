@@ -14,3 +14,4 @@ def calculate_severity(
         return "medium"
 
     return "high"
+

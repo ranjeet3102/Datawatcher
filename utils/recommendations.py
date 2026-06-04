@@ -324,3 +324,91 @@ def leakage_recommendation(
         "Multiple potential leakage features detected. "
         "Feature removal is strongly recommended."
     )
+
+
+def negative_value_recommendation(
+    count: int
+) -> str:
+
+    if count == 0:
+        return (
+            "No negative values detected."
+        )
+
+    if count <= 2:
+        return (
+            "Review columns containing negative values."
+        )
+
+    return (
+        "Multiple columns contain negative values. "
+        "Validate business rules and data quality."
+    )
+
+
+def currency_consistency_recommendation(
+    inconsistent_columns: int
+) -> str:
+
+    if inconsistent_columns == 0:
+
+        return (
+            "No currency consistency issues detected."
+        )
+
+    if inconsistent_columns <= 2:
+
+        return (
+            "Review currency formatting and standardize currency values."
+        )
+
+    return (
+        "Multiple currency consistency issues detected. "
+        "Consider applying currency normalization rules."
+    )
+
+
+def interest_rate_recommendation(
+    invalid_columns: int
+) -> str:
+
+    if invalid_columns == 0:
+        return (
+            "Interest rate values appear valid."
+        )
+
+    return (
+        "Review interest rate columns for "
+        "negative or unrealistic values."
+    )
+
+
+def balance_consistency_recommendation(
+    inconsistent_rows: int
+) -> str:
+
+    if inconsistent_rows == 0:
+
+        return (
+            "Balance relationships appear consistent."
+        )
+
+    return (
+        "Balance inconsistencies detected. "
+        "Review transaction calculations."
+    )
+
+def duplicate_timestamp_recommendation(
+    duplicate_count: int
+) -> str:
+
+    if duplicate_count == 0:
+
+        return (
+            "No duplicate timestamps detected."
+        )
+
+    return (
+        "Duplicate timestamps detected. "
+        "Review aggregation and data collection logic."
+    )

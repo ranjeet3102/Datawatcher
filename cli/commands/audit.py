@@ -87,7 +87,19 @@ from datawatcher.audits.ml.class_imbalance_audit import (
 )
 from datawatcher.audits.ml.leakage_audit import (
     LeakageAudit
-)   
+)  
+from datawatcher.scoring.readiness_scorer import (
+    calculate_ml_readiness_score
+) 
+from datawatcher.scoring.risk_summary import (
+    generate_risk_summary
+)
+from datawatcher.domains.plugin_registry import (
+    DOMAIN_PLUGINS
+)
+from datawatcher.domains.finance.audits.currency_consistency_audit import (
+    CurrencyConsistencyAudit
+)
 
 
 audit_app = typer.Typer()
@@ -270,6 +282,30 @@ def run(
     registry.register(
         LeakageAudit()
     )
+
+
+    if domain:
+
+        plugin = (
+            DOMAIN_PLUGINS.get(
+                domain
+            )
+        )
+
+        if plugin:
+
+            plugin.register_audits(
+                registry
+            )
+
+    print("\nREGISTERED AUDITS")
+
+    for audit in registry.get_audits():
+
+        print(
+            audit.audit_name
+        )
+
     
     engine = AuditEngine(
         registry
@@ -281,10 +317,66 @@ def run(
         "target": target
     }
     )
+    
+    for result in results:
+
+        if result.category in [
+            "finance",
+            "timeseries",
+            "healthcare"
+        ]:
+
+            print(
+                "\nFOUND DOMAIN AUDIT"
+            )
+
+            print(
+                result.audit_name
+            )
+
+            print(
+                result.category
+            )
+
+            print(
+                result.findings
+            )
+
+    # console.print(
+    #     f"\nAudit: {result.audit_name}"
+    # )
+
+    # console.print(
+    #     f"Category: {result.category}"
+    # )
+
+    # console.print(
+    #     f"Passed: {result.passed}"
+    # )
+
+    # console.print(
+    #     f"Severity: {result.severity}"
+    # )
+
+    # console.print(
+    #     f"Findings: {result.findings}"
+    # )
+
+    readiness = (
+    calculate_ml_readiness_score(
+        results
+    )
+    )
+
+    risk_summary = (
+    generate_risk_summary(
+        results
+    )
+    )
 
     console.print(
     "\n[bold magenta]Audit Results[/bold magenta]"
-)
+    )
 
     for result in results:
 
@@ -308,4 +400,30 @@ def run(
             f"Findings: {result.findings}"
         )
 
-    
+    console.print(
+    "\n[bold green]ML Readiness[/bold green]"
+    )
+
+    console.print(
+    f"Score: "
+    f"{readiness['ml_readiness_score']}/100"
+    )
+
+    console.print(
+    f"Grade: "
+    f"{readiness['grade']}"
+    )
+
+    console.print(
+    "\n[bold red]Dataset Risk Summary[/bold red]"
+    )
+
+    console.print(
+        f"Risk Level: "
+        f"{risk_summary['risk_level']}"
+    )
+
+    console.print(
+        f"Top Risks: "
+        f"{risk_summary['top_risks']}"
+    )

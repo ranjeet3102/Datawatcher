@@ -123,7 +123,7 @@ class SchemaConsistencyAudit(BaseAudit):
 
         else:
 
-            severity = "LOW"
+            severity = "INFO"
 
         return AuditResult(
             audit_name=self.audit_name,

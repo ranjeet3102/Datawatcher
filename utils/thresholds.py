@@ -114,3 +114,8 @@ LEAKAGE_COUNT_THRESHOLDS = {
     "low": 1,
     "medium": 3
 }
+
+NEGATIVE_VALUE_THRESHOLDS = {
+    "low": 1,
+    "medium": 3
+}

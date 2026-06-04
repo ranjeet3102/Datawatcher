@@ -70,7 +70,7 @@ class DtypeAudit(BaseAudit):
         # Severity logic
         if len(unsupported_columns) == 0:
 
-            severity = "LOW"
+            severity = "INFO"
 
         elif len(unsupported_columns) <= 2:
 

@@ -36,6 +36,10 @@ class SkewnessAudit(BaseAudit):
 
         skewed_features = {}
 
+        analyzed_numeric_columns = 0
+
+        skipped_binary_columns = 0
+
         numeric_columns = (
             df.select_dtypes(
                 include=["number"]
@@ -44,16 +48,33 @@ class SkewnessAudit(BaseAudit):
 
         for column in numeric_columns:
 
-            skewness = float(
+            series = (
                 df[column]
                 .dropna()
-                .skew()
+            )
+
+            # Skip binary / low-cardinality numeric columns
+            if (
+                series.nunique()
+                <= 2
+            ):
+
+                skipped_binary_columns += 1
+
+                continue
+
+            analyzed_numeric_columns += 1
+
+            skewness = float(
+                series.skew()
             )
 
             if (
                 abs(skewness)
                 >=
-                SKEWNESS_THRESHOLDS["high"]
+                SKEWNESS_THRESHOLDS[
+                    "high"
+                ]
             ):
 
                 skewed_features[
@@ -69,8 +90,16 @@ class SkewnessAudit(BaseAudit):
 
         findings = {
 
-            "numeric_columns":
-                len(numeric_columns),
+            "total_numeric_columns":
+                len(
+                    numeric_columns
+                ),
+
+            "analyzed_numeric_columns":
+                analyzed_numeric_columns,
+
+            "skipped_binary_columns":
+                skipped_binary_columns,
 
             "skewed_feature_count":
                 skewed_feature_count,
@@ -79,9 +108,8 @@ class SkewnessAudit(BaseAudit):
                 skewed_features
         }
 
-        passed = (
-            skewed_feature_count == 0
-        )
+        # Statistical audits are observational
+        passed = True
 
         severity = calculate_severity(
             value=skewed_feature_count,

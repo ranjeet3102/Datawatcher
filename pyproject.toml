@@ -7,8 +7,8 @@ name = "datawatcher"
 version = "0.1.0"
 description = "Production-grade dataset auditing and ML readiness scoring library"
 readme = "README.md"
-license = { file = "LICENSE" }
 requires-python = ">=3.9"
+license = { text = "MIT" }
 keywords = [
     "data quality",
     "machine learning",
@@ -34,18 +34,15 @@ dependencies = [
     "pandas>=1.5.0",
     "typer>=0.9.0",
     "rich>=13.0.0",
-    "reportlab>=4.0.0",
 ]
 
 [project.optional-dependencies]
-viz = [
-    "matplotlib>=3.7.0",
+pdf = [
+    "reportlab>=4.0.0",
 ]
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
-    "black>=23.0",
-    "ruff>=0.1.0",
 ]
 
 [project.scripts]
@@ -55,7 +52,6 @@ datawatcher = "datawatcher.cli.app:app"
 Homepage = "https://github.com/ranjeet3102/datawatcher"
 Repository = "https://github.com/ranjeet3102/datawatcher"
 Issues = "https://github.com/ranjeet3102/datawatcher/issues"
-Changelog = "https://github.com/ranjeet3102/datawatcher/blob/main/CHANGELOG.md"
 
 # The project root IS the datawatcher package directory.
 # We tell setuptools to look one level up (the parent of this folder)
@@ -68,11 +64,3 @@ find = {where = [".."], include = ["datawatcher*"]}
 
 [tool.setuptools.package-data]
 "datawatcher" = ["py.typed"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-
-[tool.ruff]
-line-length = 88
-target-version = "py39"

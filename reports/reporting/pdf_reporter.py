@@ -1,4 +1,3 @@
-import io
 import json
 from pathlib import Path
 
@@ -9,8 +8,7 @@ from reportlab.platypus import (
     Table,
     TableStyle,
     HRFlowable,
-    KeepTogether,
-    Image as RLImage
+    KeepTogether
 )
 from reportlab.lib.styles import (
     getSampleStyleSheet,
@@ -23,156 +21,6 @@ from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from datawatcher.reports.reporting.report_builder import (
     build_report_data
 )
-
-# ── Matplotlib chart helpers ──────────────────────────────────────────
-
-def _mpl_available() -> bool:
-    try:
-        import matplotlib  # noqa: F401
-        return True
-    except ImportError:
-        return False
-
-
-def _chart_image(fig, width_inch: float = 6.5) -> RLImage:
-    """Convert a matplotlib Figure to a ReportLab Image flowable."""
-    buf = io.BytesIO()
-    fig.savefig(buf, format="png", dpi=130, bbox_inches="tight")
-    buf.seek(0)
-    import matplotlib.pyplot as plt
-    plt.close(fig)
-    return RLImage(buf, width=width_inch * inch)
-
-
-def _missing_values_figure(audits: list):
-    """Horizontal bar: per-column missing %."""
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
-    mv = next((a for a in audits if a["audit_name"] == "missing_value_audit"), None)
-    if not mv:
-        return None
-    col_stats = mv["findings"].get("column_missing_stats", {})
-    if not col_stats:
-        return None
-
-    sorted_cols = sorted(col_stats.items(), key=lambda x: x[1]["missing_percentage"])
-    labels = [c for c, _ in sorted_cols]
-    values = [v["missing_percentage"] for _, v in sorted_cols]
-    bar_colors = ["#dc3545" if v > 15 else "#ffc107" if v > 3 else "#17a2b8" for v in values]
-
-    fig, ax = plt.subplots(figsize=(6.5, max(2.5, len(labels) * 0.35)))
-    bars = ax.barh(labels, values, color=bar_colors, edgecolor="none", height=0.55)
-    ax.set_xlabel("Missing %", fontsize=9)
-    ax.set_xlim(0, max(values) * 1.15 + 1)
-    ax.tick_params(labelsize=8)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.set_title("Missing Values per Column", fontsize=10, fontweight="bold")
-    for bar, val in zip(bars, values):
-        ax.text(bar.get_width() + 0.3, bar.get_y() + bar.get_height() / 2,
-                f"{val:.1f}%", va="center", fontsize=7)
-    fig.tight_layout()
-    return fig
-
-
-def _outlier_figure(audits: list):
-    """Horizontal bar: per-column outlier %."""
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
-    oa = next((a for a in audits if a["audit_name"] == "outlier_audit"), None)
-    if not oa:
-        return None
-    features = oa["findings"].get("outlier_features", {})
-    if not features:
-        return None
-
-    sorted_f = sorted(features.items(), key=lambda x: x[1]["outlier_pct"])
-    labels = [c for c, _ in sorted_f]
-    values = [v["outlier_pct"] for _, v in sorted_f]
-    bar_colors = ["#dc3545" if v > 5 else "#ffc107" if v > 2 else "#17a2b8" for v in values]
-
-    fig, ax = plt.subplots(figsize=(6.5, max(2.5, len(labels) * 0.35)))
-    bars = ax.barh(labels, values, color=bar_colors, edgecolor="none", height=0.55)
-    ax.set_xlabel("Outlier %", fontsize=9)
-    ax.tick_params(labelsize=8)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.set_title("Outlier Rates per Column (IQR Method)", fontsize=10, fontweight="bold")
-    for bar, val in zip(bars, values):
-        ax.text(bar.get_width() + 0.1, bar.get_y() + bar.get_height() / 2,
-                f"{val:.2f}%", va="center", fontsize=7)
-    fig.tight_layout()
-    return fig
-
-
-def _skewness_figure(audits: list):
-    """Diverging bar chart of skewed features."""
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
-    sa = next((a for a in audits if a["audit_name"] == "skewness_audit"), None)
-    if not sa:
-        return None
-    skewed = sa["findings"].get("skewed_features", {})
-    if not skewed:
-        return None
-
-    sorted_s = sorted(skewed.items(), key=lambda x: x[1])
-    labels = [c for c, _ in sorted_s]
-    values = [v for _, v in sorted_s]
-    bar_colors = ["#fd7e14" if v > 0 else "#4361ee" for v in values]
-
-    fig, ax = plt.subplots(figsize=(6.5, max(2.5, len(labels) * 0.35)))
-    ax.barh(labels, values, color=bar_colors, edgecolor="none", height=0.55)
-    ax.axvline(0, color="#333", linewidth=0.8, linestyle="--")
-    ax.set_xlabel("Skewness", fontsize=9)
-    ax.tick_params(labelsize=8)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.set_title("Skewed Features (|skew| ≥ 1.0)", fontsize=10, fontweight="bold")
-    fig.tight_layout()
-    return fig
-
-
-def _category_breakdown_figure(audits: list):
-    """Stacked bar: audits by category, pass vs fail."""
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-    import numpy as np
-
-    cats = {}
-    for a in audits:
-        c = a["category"]
-        if c not in cats:
-            cats[c] = {"passed": 0, "failed": 0}
-        if a["passed"]:
-            cats[c]["passed"] += 1
-        else:
-            cats[c]["failed"] += 1
-
-    labels   = list(cats.keys())
-    passed_d = [cats[c]["passed"] for c in labels]
-    failed_d = [cats[c]["failed"] for c in labels]
-    x = np.arange(len(labels))
-
-    fig, ax = plt.subplots(figsize=(6.5, 3))
-    ax.bar(x, passed_d, label="Passed", color="#28a745", edgecolor="none")
-    ax.bar(x, failed_d, bottom=passed_d, label="Failed", color="#dc3545", edgecolor="none")
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels, fontsize=9)
-    ax.set_ylabel("Audits", fontsize=9)
-    ax.legend(fontsize=8)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.set_title("Audit Results by Category", fontsize=10, fontweight="bold")
-    fig.tight_layout()
-    return fig
 
 # ── Colour palette ────────────────────────────────────────────────────
 _SEVERITY_COLORS = {
@@ -532,27 +380,6 @@ def export_pdf_report(
     )
     elements.append(Spacer(1, 14))
 
-    # ── Visualizations (matplotlib charts, only if matplotlib installed) ──
-    if _mpl_available():
-        viz_items = [
-            ("Missing Values per Column",   _missing_values_figure(audits)),
-            ("Outlier Rates per Column",     _outlier_figure(audits)),
-            ("Skewed Features",              _skewness_figure(audits)),
-            ("Audit Results by Category",    _category_breakdown_figure(audits)),
-        ]
-        for title, fig in viz_items:
-            if fig is not None:
-                elements.append(
-                    Paragraph(title, styles["h2"])
-                )
-                elements.append(HRFlowable(
-                    width="100%", thickness=1,
-                    color=colors.HexColor("#dde4f0")
-                ))
-                elements.append(Spacer(1, 6))
-                elements.append(_chart_image(fig))
-                elements.append(Spacer(1, 14))
-
     # ── Per-audit results ─────────────────────────────────────────────
     elements.append(
         Paragraph(
@@ -563,8 +390,6 @@ def export_pdf_report(
     elements.append(HRFlowable(width="100%", thickness=1,
                                color=colors.HexColor("#dde4f0")))
     elements.append(Spacer(1, 8))
-
-
 
     for audit in audits:
 

@@ -1,4 +1,5 @@
 from os import path
+from pathlib import Path
 
 import typer
 from rich.console import Console
@@ -126,7 +127,13 @@ def run(
     domain: str = None,
     export_json: bool = False,
     export_html: bool = False,
-    export_pdf: bool = False
+    export_pdf: bool = False,
+    output_dir: str = typer.Option(
+        None,
+        "--output-dir",
+        "-o",
+        help="Directory to save reports (default: current working directory)"
+    )
 ):
 
     if domain and domain not in SUPPORTED_DOMAINS:
@@ -381,6 +388,11 @@ def run(
     )
     )
 
+    # Resolve output directory — default to cwd so reports land
+    # wherever the user ran the command, not inside the library.
+    out_dir = Path(output_dir) if output_dir else Path.cwd()
+    out_dir.mkdir(parents=True, exist_ok=True)
+
     dataset_metadata = {
         "file_path":   path,
         "rows":        dataset.metadata.get("rows"),
@@ -397,8 +409,9 @@ def run(
                 audit_results=results,
                 readiness=readiness,
                 risk_summary=risk_summary,
-                output_path=
-                "datawatcher/reporting/audit_report.json",
+                output_path=str(
+                    out_dir / "audit_report.json"
+                ),
                 dataset_metadata=dataset_metadata
             )
         )
@@ -415,8 +428,9 @@ def run(
                 audit_results=results,
                 readiness=readiness,
                 risk_summary=risk_summary,
-                output_path=
-                "datawatcher/reporting/audit_report.html",
+                output_path=str(
+                    out_dir / "audit_report.html"
+                ),
                 dataset_metadata=dataset_metadata
             )
         )
@@ -433,8 +447,9 @@ def run(
                 audit_results=results,
                 readiness=readiness,
                 risk_summary=risk_summary,
-                output_path=
-                "datawatcher/reporting/audit_report.pdf",
+                output_path=str(
+                    out_dir / "audit_report.pdf"
+                ),
                 dataset_metadata=dataset_metadata
             )
         )

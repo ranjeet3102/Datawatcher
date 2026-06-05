@@ -11,11 +11,11 @@ from datawatcher.utils.severity import (
 )
 
 from datawatcher.utils.thresholds import (
-    OUTLIER_COUNT_THRESHOLDS
+    OUTLIER_THRESHOLDS
 )
 
 from datawatcher.utils.recommendations import (
-    outlier_recommendation
+    outlier_pct_recommendation
 )
 
 
@@ -33,9 +33,11 @@ class OutlierAudit(BaseAudit):
 
         df = dataset.df
 
+        total_rows = len(df)
+
         outlier_features = {}
 
-        total_outliers = 0
+        total_outlier_rows = set()
 
         numeric_columns = (
             df.select_dtypes(
@@ -68,54 +70,73 @@ class OutlierAudit(BaseAudit):
                 q3 + (1.5 * iqr)
             )
 
-            outlier_count = int(
-                (
-                    (series < lower_bound)
-                    |
-                    (series > upper_bound)
-                ).sum()
+            outlier_mask = (
+                (df[column] < lower_bound)
+                |
+                (df[column] > upper_bound)
             )
+
+            outlier_indices = (
+                df.index[outlier_mask].tolist()
+            )
+
+            outlier_count = len(outlier_indices)
 
             if outlier_count > 0:
 
-                outlier_features[
-                    column
-                ] = outlier_count
-
-                total_outliers += (
-                    outlier_count
+                outlier_pct = round(
+                    (outlier_count / total_rows) * 100,
+                    4
                 )
+
+                outlier_features[column] = {
+                    "outlier_count": outlier_count,
+                    "outlier_pct": outlier_pct,
+                    "lower_bound": round(float(lower_bound), 4),
+                    "upper_bound": round(float(upper_bound), 4)
+                }
+
+                # Track unique rows with any outlier (for overall %)
+                total_outlier_rows.update(outlier_indices)
+
+        total_outlier_row_count = len(total_outlier_rows)
+
+        overall_outlier_pct = round(
+            (total_outlier_row_count / total_rows) * 100,
+            4
+        ) if total_rows > 0 else 0.0
 
         findings = {
 
-            "numeric_columns":
+            "total_rows":
+                total_rows,
+
+            "numeric_columns_analyzed":
                 len(numeric_columns),
 
             "outlier_feature_count":
                 len(outlier_features),
 
-            "total_outliers":
-                total_outliers,
+            "total_outlier_rows":
+                total_outlier_row_count,
+
+            "overall_outlier_pct":
+                overall_outlier_pct,
 
             "outlier_features":
                 outlier_features
         }
 
+        # Percentage-based severity — correct for large data
         severity = calculate_severity(
-            value=total_outliers,
-            low_threshold=
-            OUTLIER_COUNT_THRESHOLDS[
-                "low"
-            ],
-            medium_threshold=
-            OUTLIER_COUNT_THRESHOLDS[
-                "medium"
-            ]
+            value=overall_outlier_pct,
+            low_threshold=OUTLIER_THRESHOLDS["low_pct"],
+            medium_threshold=OUTLIER_THRESHOLDS["medium_pct"]
         )
 
         recommendations = [
-            outlier_recommendation(
-                total_outliers
+            outlier_pct_recommendation(
+                overall_outlier_pct
             )
         ]
 

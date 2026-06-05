@@ -97,10 +97,15 @@ from datawatcher.scoring.risk_summary import (
 from datawatcher.domains.plugin_registry import (
     DOMAIN_PLUGINS
 )
-from datawatcher.domains.finance.audits.currency_consistency_audit import (
-    CurrencyConsistencyAudit
+from datawatcher.reports.reporting.json_reporter import (
+    export_json_report
 )
-
+from datawatcher.reports.reporting.html_reporter import (
+    export_html_report
+)
+from datawatcher.reports.reporting.pdf_reporter import (
+    export_pdf_report
+)
 
 audit_app = typer.Typer()
 
@@ -109,8 +114,7 @@ console = Console()
 SUPPORTED_DOMAINS = [
     "finance",
     "timeseries",
-    "healthcare",
-    "time series"
+    "healthcare"
 ]
 
 
@@ -119,7 +123,10 @@ SUPPORTED_DOMAINS = [
 def run(
     path: str,
     target: str = None,
-    domain: str = None
+    domain: str = None,
+    export_json: bool = False,
+    export_html: bool = False,
+    export_pdf: bool = False
 ):
 
     if domain and domain not in SUPPORTED_DOMAINS:
@@ -373,6 +380,69 @@ def run(
         results
     )
     )
+
+    dataset_metadata = {
+        "file_path":   path,
+        "rows":        dataset.metadata.get("rows"),
+        "columns":     dataset.metadata.get("columns"),
+        "memory_mb":   dataset.metadata.get("memory_usage_mb"),
+        "target":      target,
+        "domain":      domain,
+    }
+
+    if export_json:
+
+        report_path = (
+            export_json_report(
+                audit_results=results,
+                readiness=readiness,
+                risk_summary=risk_summary,
+                output_path=
+                "datawatcher/reporting/audit_report.json",
+                dataset_metadata=dataset_metadata
+            )
+        )
+
+        console.print(
+            f"\n[bold green]JSON Report Saved:[/bold green] "
+            f"{report_path}"
+        )
+
+    if export_html:
+
+        report_path = (
+            export_html_report(
+                audit_results=results,
+                readiness=readiness,
+                risk_summary=risk_summary,
+                output_path=
+                "datawatcher/reporting/audit_report.html",
+                dataset_metadata=dataset_metadata
+            )
+        )
+
+        console.print(
+            f"\n[bold green]HTML Report Saved:[/bold green] "
+            f"{report_path}"
+        )
+
+    if export_pdf:
+
+        report_path = (
+            export_pdf_report(
+                audit_results=results,
+                readiness=readiness,
+                risk_summary=risk_summary,
+                output_path=
+                "datawatcher/reporting/audit_report.pdf",
+                dataset_metadata=dataset_metadata
+            )
+        )
+
+        console.print(
+            f"\n[bold green]PDF Report Saved:[/bold green] "
+            f"{report_path}"
+        )
 
     console.print(
     "\n[bold magenta]Audit Results[/bold magenta]"

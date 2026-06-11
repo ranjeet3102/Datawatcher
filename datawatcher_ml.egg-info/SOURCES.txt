@@ -50,6 +50,12 @@ core/audit_registry.py
 core/audit_result.py
 core/base_audit.py
 core/dataset.py
+datawatcher_ml.egg-info/PKG-INFO
+datawatcher_ml.egg-info/SOURCES.txt
+datawatcher_ml.egg-info/dependency_links.txt
+datawatcher_ml.egg-info/entry_points.txt
+datawatcher_ml.egg-info/requires.txt
+datawatcher_ml.egg-info/top_level.txt
 domains/__init__.py
 domains/base_plugin.py
 domains/plugin_registry.py

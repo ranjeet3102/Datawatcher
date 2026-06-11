@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "datawatcher-ml"
-version = "0.1.0"
+version = "0.1.1"
 description = "Production-grade dataset auditing and ML readiness scoring library"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -52,11 +52,32 @@ Homepage = "https://github.com/ranjeet3102/datawatcher"
 Repository = "https://github.com/ranjeet3102/datawatcher"
 Issues = "https://github.com/ranjeet3102/datawatcher/issues"
 
-# The project root IS the datawatcher package directory.
-# We tell setuptools to look one level up (the parent of this folder)
-# so it can find `datawatcher` as a named package.
-[tool.setuptools]
-package-dir = {"datawatcher" = "."}
+# Explicitly map every sub-package so setuptools includes all source in the wheel.
+# The project root (.) IS the datawatcher package — so each subdir is a sub-package.
+[tool.setuptools.package-dir]
+datawatcher = "."
+"datawatcher.audits" = "audits"
+"datawatcher.audits.categorical" = "audits/categorical"
+"datawatcher.audits.ml" = "audits/ml"
+"datawatcher.audits.quality" = "audits/quality"
+"datawatcher.audits.statistical" = "audits/statistical"
+"datawatcher.audits.structural" = "audits/structural"
+"datawatcher.cli" = "cli"
+"datawatcher.cli.commands" = "cli/commands"
+"datawatcher.core" = "core"
+"datawatcher.domains" = "domains"
+"datawatcher.domains.finance" = "domains/finance"
+"datawatcher.domains.finance.audits" = "domains/finance/audits"
+"datawatcher.domains.healthcare" = "domains/healthcare"
+"datawatcher.domains.healthcare.audits" = "domains/healthcare/audits"
+"datawatcher.domains.timeseries" = "domains/timeseries"
+"datawatcher.domains.timeseries.audits" = "domains/timeseries/audits"
+"datawatcher.loaders" = "loaders"
+"datawatcher.reports" = "reports"
+"datawatcher.reports.reporting" = "reports/reporting"
+"datawatcher.scoring" = "scoring"
+"datawatcher.semantic" = "semantic"
+"datawatcher.utils" = "utils"
 
 [tool.setuptools.packages]
 find = {where = [".."], include = ["datawatcher*"]}

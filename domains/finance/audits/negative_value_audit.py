@@ -118,7 +118,6 @@ class NegativeValueAudit(BaseAudit):
             audit_name=self.audit_name,
             category=self.category,
 
-            # Observational audit
             passed=True,
 
             severity=severity,

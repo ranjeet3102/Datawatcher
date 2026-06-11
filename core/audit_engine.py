@@ -1,8 +1,5 @@
 class AuditEngine:
-    """
-    Executes registered audits.
-    """
-
+ 
     def __init__(
         self,
         registry

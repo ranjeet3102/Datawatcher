@@ -40,10 +40,7 @@ class MemoryUsageAudit(BaseAudit):
                 / (1024 * 1024)
             )
 
-            # column_memory[column] = round(
-            #     memory_mb,
-            #     2
-            # )
+            
             column_memory[column] = float(
             round(
               memory_mb,
@@ -51,13 +48,7 @@ class MemoryUsageAudit(BaseAudit):
                      )
                 )
 
-        # findings = {
-        #     "total_memory_mb": round(
-        #         total_memory_mb,
-        #         2
-        #     ),
-        #     "column_memory_mb": column_memory
-        # }
+       
 
         findings = {
         "total_memory_mb": float(
@@ -71,7 +62,6 @@ class MemoryUsageAudit(BaseAudit):
 
         recommendations = []
 
-        # Validation logic
         passed = True
 
         if (
@@ -85,7 +75,6 @@ class MemoryUsageAudit(BaseAudit):
                 "Dataset memory usage is extremely high."
             )
 
-        # Severity logic
         if (
             total_memory_mb
             > self.CRITICAL_MEMORY_MB

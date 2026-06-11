@@ -35,7 +35,6 @@ class SchemaConsistencyAudit(BaseAudit):
 
         invalid_columns = []
 
-        # Duplicate column detection
         seen = set()
 
         for column in columns:
@@ -48,7 +47,6 @@ class SchemaConsistencyAudit(BaseAudit):
 
             seen.add(column)
 
-        # Empty column detection
         for column in columns:
 
             if not str(column).strip():
@@ -57,7 +55,6 @@ class SchemaConsistencyAudit(BaseAudit):
                     column
                 )
 
-        # Invalid naming detection
         for column in columns:
 
             if not re.match(
@@ -85,7 +82,6 @@ class SchemaConsistencyAudit(BaseAudit):
             len(columns)
         )
 
-        # Validation logic
         passed = True
 
         if (
@@ -96,7 +92,6 @@ class SchemaConsistencyAudit(BaseAudit):
 
             passed = False
 
-        # Severity logic
         if duplicate_columns:
 
             severity = "HIGH"

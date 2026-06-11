@@ -1,9 +1,7 @@
 def generate_risk_summary(
     audit_results
 ):
-    """
-    Generate dataset risk summary.
-    """
+    
 
     severity_order = {
         "INFO": 0,
@@ -13,7 +11,6 @@ def generate_risk_summary(
         "CRITICAL": 4
     }
 
-    # Only include actual risks
     risk_results = [
 
         result

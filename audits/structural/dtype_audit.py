@@ -62,12 +62,10 @@ class DtypeAudit(BaseAudit):
             len(unsupported_columns)
         )
 
-        # Validation logic
         passed = (
             len(unsupported_columns) == 0
         )
 
-        # Severity logic
         if len(unsupported_columns) == 0:
 
             severity = "INFO"

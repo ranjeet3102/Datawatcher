@@ -6,9 +6,7 @@ from datawatcher.core.audit_result import (
 
 
 class BaseAudit(ABC):
-    """
-    Base interface for all audits.
-    """
+  
 
     audit_name = "base_audit"
 
@@ -20,7 +18,5 @@ class BaseAudit(ABC):
         dataset,
         context=None
     ) -> AuditResult:
-        """
-        Execute audit.
-        """
+    
         pass

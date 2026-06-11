@@ -1,10 +1,3 @@
-# ============================================================
-# DataWatcher — Human-Readable Recommendations
-#
-# Text thresholds updated to match the new research-backed
-# values in utils/thresholds.py.
-# ============================================================
-
 
 def missing_value_recommendation(
     missing_percentage: float

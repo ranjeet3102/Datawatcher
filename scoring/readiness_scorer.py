@@ -24,9 +24,7 @@ def readiness_grade(
 def calculate_ml_readiness_score(
     audit_results
 ):
-    """
-    Calculate ML readiness score.
-    """
+    
 
     penalty_result = (
         calculate_total_penalty(

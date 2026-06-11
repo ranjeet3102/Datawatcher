@@ -4,9 +4,7 @@ from typing import Dict, List, Any
 
 @dataclass
 class AuditResult:
-    """
-    Standardized audit output object.
-    """
+  
 
     audit_name: str
 

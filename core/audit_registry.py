@@ -1,7 +1,5 @@
 class AuditRegistry:
-    """
-    Stores registered audits.
-    """
+    
 
     def __init__(self):
 

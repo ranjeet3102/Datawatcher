@@ -96,7 +96,6 @@ class LeakageAudit(BaseAudit):
 
             risk_score = 0
 
-            # Name similarity
             if (
                 target.lower()
                 in column.lower()
@@ -105,7 +104,6 @@ class LeakageAudit(BaseAudit):
 
             series = df[column]
 
-            # Perfect match
             try:
 
                 if (
@@ -118,7 +116,6 @@ class LeakageAudit(BaseAudit):
             except Exception:
                 pass
 
-            # Correlation check
             try:
 
                 if pd.api.types.is_numeric_dtype(

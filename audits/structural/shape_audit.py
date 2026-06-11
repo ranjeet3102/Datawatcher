@@ -34,7 +34,6 @@ class ShapeAudit(BaseAudit):
 
         recommendations = []
 
-        # Validation logic
         passed = True
 
         if rows < self.MIN_ROWS:
@@ -53,7 +52,6 @@ class ShapeAudit(BaseAudit):
                 "Dataset contains too few columns."
             )
 
-        # Severity logic
         if rows == 0 or columns == 0:
 
             severity = "CRITICAL"

@@ -1,0 +1,2 @@
+[console_scripts]
+datawatcher = datawatcher.cli.app:app

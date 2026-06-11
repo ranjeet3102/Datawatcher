@@ -6,8 +6,52 @@ DATETIME_KEYWORDS = [
     "time",
     "timestamp",
     "created",
+    "created_at",
     "updated",
-    "dob"
+    "updated_at",
+    "modified",
+    "modified_at",
+    "birthday",
+    "birthdate",
+    "dob",
+    "event_date",
+    "event_time",
+    "start_time",
+    "start_date",
+    "end_time",
+    "end_date",
+    "transaction_date",
+    "purchase_date",
+    "order_date",
+    "payment_date",
+    "join_date",
+    "hire_date",
+    "registration_date",
+    "signup_date",
+    "renewal_date",
+    "schedule_date",
+    "appointment_date",
+    "meeting_date",
+    "meeting_time",
+    "log_date",
+    "logged_at",
+    "access_time",
+    "_dt",
+    "_date",
+    "_time",
+    "_ts",
+    "ts",
+    "_timestamp",
+    "last_login",
+    "last_seen",
+    "last_active",
+    "login_time",
+    "logout_time",
+    "login",
+    "logout",
+    "joined",
+    "registered",
+    "scheduled"
 ]
 
 BOOLEAN_MAPPINGS = {
@@ -25,9 +69,6 @@ BOOLEAN_MAPPINGS = {
 def looks_like_datetime_column(
     column_name: str
 ) -> bool:
-    """
-    Check whether column name suggests datetime data.
-    """
 
     column_name = column_name.lower()
 
@@ -40,9 +81,7 @@ def looks_like_datetime_column(
 def try_numeric_conversion(
     series: pd.Series
 ) -> pd.Series:
-    """
-    Attempt numeric conversion safely.
-    """
+    
 
     try:
 
@@ -61,10 +100,7 @@ def try_numeric_conversion(
 def try_datetime_conversion(
     series: pd.Series
 ) -> pd.Series:
-    """
-    Attempt datetime conversion safely.
-    """
-
+    
     try:
 
         converted = pd.to_datetime(
@@ -83,17 +119,13 @@ def try_datetime_conversion(
 def normalize_dtypes(
     df: pd.DataFrame
 ) -> pd.DataFrame:
-    """
-    Normalize dataframe dtypes safely.
-    """
-
+   
     df = df.copy()
 
     for column in df.columns:
 
         series = df[column]
 
-        # Skip already-normalized columns
         if (
             pd.api.types.is_numeric_dtype(series)
             or pd.api.types.is_datetime64_any_dtype(series)
@@ -101,9 +133,8 @@ def normalize_dtypes(
         ):
             continue
 
-        # Try numeric conversion
         series = clean_empty_strings(series)
-        
+    
         converted_series = try_numeric_conversion(
             series
         )
@@ -114,7 +145,6 @@ def normalize_dtypes(
 
             continue
 
-        # Try boolean conversion
         converted_series = try_boolean_conversion(
             series
         )
@@ -125,8 +155,6 @@ def normalize_dtypes(
 
             continue
 
-        # Only attempt datetime parsing
-        # if column name suggests datetime
         if looks_like_datetime_column(column):
 
             converted_series = (
@@ -145,9 +173,6 @@ def normalize_dtypes(
 def try_boolean_conversion(
     series: pd.Series
 ) -> pd.Series:
-    """
-    Attempt boolean normalization safely.
-    """
 
     if not pd.api.types.is_object_dtype(series):
 
@@ -177,9 +202,7 @@ def try_boolean_conversion(
 def clean_empty_strings(
     series: pd.Series
 ) -> pd.Series:
-    """
-    Replace empty/whitespace strings with NA.
-    """
+    
 
     if not pd.api.types.is_object_dtype(series):
 

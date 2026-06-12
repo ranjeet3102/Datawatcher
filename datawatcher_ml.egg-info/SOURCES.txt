@@ -6,12 +6,6 @@ pyproject.toml
 ./__init__.py
 ./_version.py
 ./api.py
-../datawatcher_ml.egg-info/PKG-INFO
-../datawatcher_ml.egg-info/SOURCES.txt
-../datawatcher_ml.egg-info/dependency_links.txt
-../datawatcher_ml.egg-info/entry_points.txt
-../datawatcher_ml.egg-info/requires.txt
-../datawatcher_ml.egg-info/top_level.txt
 audits/__init__.py
 audits/categorical/__init__.py
 audits/categorical/category_frequency_audit.py

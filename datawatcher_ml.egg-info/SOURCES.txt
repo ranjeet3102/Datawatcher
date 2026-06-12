@@ -107,6 +107,7 @@ semantic/datetime_detector.py
 semantic/detector.py
 semantic/identifier.py
 semantic/text_detector.py
+tests/test_datawatcher.py
 utils/__init__.py
 utils/percentages.py
 utils/recommendations.py

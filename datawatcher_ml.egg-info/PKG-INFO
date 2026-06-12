@@ -242,15 +242,15 @@ results = engine.run(dataset, context={"target": "label"})
 
 ```python
 {
-    "audit_results": [AuditResult, ...],   # list of all audit results
+    "audit_results": [AuditResult, ...],   
     "ml_readiness": {
-        "score": 84,                        # 0-100
-        "grade": "GOOD",                    # EXCELLENT/GOOD/FAIR/POOR
+        "score": 84,                        
+        "grade": "GOOD",                   
         "total_penalty": 16.0,
         "severity_breakdown": {...}
     },
     "risk_summary": {
-        "risk_level": "LOW",               # LOW/MEDIUM/HIGH
+        "risk_level": "LOW",              
         "top_risks": ["audit_name", ...],
         "high_risk_audits": [...],
         "medium_risk_audits": [...]
@@ -261,7 +261,7 @@ results = engine.run(dataset, context={"target": "label"})
         "memory_usage_mb": 4.2
     },
     "semantic_types": {
-        "column_name": "numeric",          # numeric/categorical/datetime/...
+        "column_name": "numeric",       
         ...
     }
 }

@@ -1,164 +1,9 @@
 import json
 from pathlib import Path
 
-from reportlab.platypus import (
-    SimpleDocTemplate,
-    Paragraph,
-    Spacer,
-    Table,
-    TableStyle,
-    HRFlowable,
-    KeepTogether
-)
-from reportlab.lib.styles import (
-    getSampleStyleSheet,
-    ParagraphStyle
-)
-from reportlab.lib import colors
-from reportlab.lib.units import inch
-from reportlab.lib.enums import TA_CENTER, TA_LEFT
-
 from datawatcher.reports.reporting.report_builder import (
     build_report_data
 )
-
-# ── Colour palette ────────────────────────────────────────────────────
-_SEVERITY_COLORS = {
-    "INFO":     colors.HexColor("#6c757d"),
-    "LOW":      colors.HexColor("#17a2b8"),
-    "MEDIUM":   colors.HexColor("#ffc107"),
-    "HIGH":     colors.HexColor("#fd7e14"),
-    "CRITICAL": colors.HexColor("#dc3545"),
-}
-
-_GRADE_COLORS = {
-    "EXCELLENT": colors.HexColor("#28a745"),
-    "GOOD":      colors.HexColor("#20c997"),
-    "FAIR":      colors.HexColor("#ffc107"),
-    "POOR":      colors.HexColor("#dc3545"),
-}
-
-_RISK_COLORS = {
-    "LOW":    colors.HexColor("#28a745"),
-    "MEDIUM": colors.HexColor("#ffc107"),
-    "HIGH":   colors.HexColor("#dc3545"),
-}
-
-_HEADER_BG  = colors.HexColor("#1a1a2e")
-_ROW_ALT_BG = colors.HexColor("#f0f4ff")
-
-
-def _get_styles():
-    base = getSampleStyleSheet()
-
-    styles = {
-        "title": ParagraphStyle(
-            "DWTitle",
-            parent=base["Title"],
-            fontSize=22,
-            textColor=colors.white,
-            spaceAfter=4,
-            alignment=TA_CENTER
-        ),
-        "subtitle": ParagraphStyle(
-            "DWSubtitle",
-            parent=base["Normal"],
-            fontSize=9,
-            textColor=colors.HexColor("#ccccdd"),
-            spaceAfter=0,
-            alignment=TA_CENTER
-        ),
-        "h2": ParagraphStyle(
-            "DWH2",
-            parent=base["Heading2"],
-            fontSize=13,
-            textColor=_HEADER_BG,
-            spaceBefore=18,
-            spaceAfter=6,
-            borderPad=4
-        ),
-        "h3": ParagraphStyle(
-            "DWH3",
-            parent=base["Heading3"],
-            fontSize=11,
-            textColor=_HEADER_BG,
-            spaceBefore=10,
-            spaceAfter=4
-        ),
-        "h4": ParagraphStyle(
-            "DWH4",
-            parent=base["Normal"],
-            fontSize=9,
-            textColor=colors.HexColor("#555555"),
-            spaceBefore=6,
-            spaceAfter=2,
-            fontName="Helvetica-Bold"
-        ),
-        "body": ParagraphStyle(
-            "DWBody",
-            parent=base["BodyText"],
-            fontSize=9,
-            spaceAfter=2,
-            leading=13
-        ),
-        "cell": ParagraphStyle(
-            "DWCell",
-            parent=base["Normal"],
-            fontSize=8,
-            leading=10,
-            wordWrap="LTR"
-        ),
-        "label": ParagraphStyle(
-            "DWLabel",
-            parent=base["Normal"],
-            fontSize=8,
-            textColor=colors.HexColor("#333333"),
-            fontName="Helvetica-Bold"
-        ),
-    }
-    return styles
-
-
-def _severity_color(severity: str) -> colors.Color:
-    return _SEVERITY_COLORS.get(
-        severity.upper(),
-        colors.grey
-    )
-
-
-def _grade_color(grade: str) -> colors.Color:
-    return _GRADE_COLORS.get(grade, colors.grey)
-
-
-def _risk_color(risk_level: str) -> colors.Color:
-    return _RISK_COLORS.get(risk_level, colors.grey)
-
-
-def _kv_table(pairs: list, styles: dict) -> Table:
-    """
-    Build a two-column key-value table.
-    `pairs` is a list of (key, value) tuples.
-    """
-    data = [
-        [
-            Paragraph(str(k), styles["label"]),
-            Paragraph(str(v), styles["cell"])
-        ]
-        for k, v in pairs
-    ]
-    t = Table(data, colWidths=[2.2 * inch, None])
-    t.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#f0f4ff")),
-        ("GRID",       (0, 0), (-1, -1), 0.4, colors.HexColor("#dde4f0")),
-        ("VALIGN",     (0, 0), (-1, -1), "TOP"),
-        ("ROWBACKGROUNDS", (1, 0), (1, -1),
-         [colors.white, colors.HexColor("#f8f9fa")]),
-        ("TOPPADDING",    (0, 0), (-1, -1), 5),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
-        ("LEFTPADDING",   (0, 0), (-1, -1), 6),
-        ("RIGHTPADDING",  (0, 0), (-1, -1), 6),
-    ]))
-    return t
 
 
 def _findings_value(value) -> str:
@@ -190,6 +35,122 @@ def export_pdf_report(
     - All audit results: audit_name, category, passed, severity,
       full findings (key-value table), and recommendations list
     """
+
+    # reportlab is an optional dependency — only import when PDF export
+    # is actually requested so the CLI doesn't crash on startup.
+    try:
+        from reportlab.platypus import (
+            SimpleDocTemplate,
+            Paragraph,
+            Spacer,
+            Table,
+            TableStyle,
+            HRFlowable,
+            KeepTogether,
+        )
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib import colors
+        from reportlab.lib.units import inch
+        from reportlab.lib.enums import TA_CENTER, TA_LEFT
+    except ImportError:
+        raise ImportError(
+            "PDF export requires the 'reportlab' package.\n"
+            "Install it with:  pip install datawatcher-ml[pdf]"
+        )
+
+    # ── Colour palette (defined here because they need reportlab.colors) ──
+    _SEVERITY_COLORS = {
+        "INFO":     colors.HexColor("#6c757d"),
+        "LOW":      colors.HexColor("#17a2b8"),
+        "MEDIUM":   colors.HexColor("#ffc107"),
+        "HIGH":     colors.HexColor("#fd7e14"),
+        "CRITICAL": colors.HexColor("#dc3545"),
+    }
+    _GRADE_COLORS = {
+        "EXCELLENT": colors.HexColor("#28a745"),
+        "GOOD":      colors.HexColor("#20c997"),
+        "FAIR":      colors.HexColor("#ffc107"),
+        "POOR":      colors.HexColor("#dc3545"),
+    }
+    _RISK_COLORS = {
+        "LOW":    colors.HexColor("#28a745"),
+        "MEDIUM": colors.HexColor("#ffc107"),
+        "HIGH":   colors.HexColor("#dc3545"),
+    }
+    _HEADER_BG  = colors.HexColor("#1a1a2e")
+    _ROW_ALT_BG = colors.HexColor("#f0f4ff")
+
+    def _severity_color(severity):
+        return _SEVERITY_COLORS.get(severity.upper(), colors.grey)
+
+    def _grade_color(grade):
+        return _GRADE_COLORS.get(grade, colors.grey)
+
+    def _risk_color(risk_level):
+        return _RISK_COLORS.get(risk_level, colors.grey)
+
+    def _get_styles():
+        base = getSampleStyleSheet()
+        return {
+            "title": ParagraphStyle(
+                "DWTitle", parent=base["Title"],
+                fontSize=22, textColor=colors.white,
+                spaceAfter=4, alignment=TA_CENTER
+            ),
+            "subtitle": ParagraphStyle(
+                "DWSubtitle", parent=base["Normal"],
+                fontSize=9, textColor=colors.HexColor("#ccccdd"),
+                spaceAfter=0, alignment=TA_CENTER
+            ),
+            "h2": ParagraphStyle(
+                "DWH2", parent=base["Heading2"],
+                fontSize=13, textColor=_HEADER_BG,
+                spaceBefore=18, spaceAfter=6, borderPad=4
+            ),
+            "h3": ParagraphStyle(
+                "DWH3", parent=base["Heading3"],
+                fontSize=11, textColor=_HEADER_BG,
+                spaceBefore=10, spaceAfter=4
+            ),
+            "h4": ParagraphStyle(
+                "DWH4", parent=base["Normal"],
+                fontSize=9, textColor=colors.HexColor("#555555"),
+                spaceBefore=6, spaceAfter=2, fontName="Helvetica-Bold"
+            ),
+            "body": ParagraphStyle(
+                "DWBody", parent=base["BodyText"],
+                fontSize=9, spaceAfter=2, leading=13
+            ),
+            "cell": ParagraphStyle(
+                "DWCell", parent=base["Normal"],
+                fontSize=8, leading=10, wordWrap="LTR"
+            ),
+            "label": ParagraphStyle(
+                "DWLabel", parent=base["Normal"],
+                fontSize=8, textColor=colors.HexColor("#333333"),
+                fontName="Helvetica-Bold"
+            ),
+        }
+
+    def _kv_table(pairs, styles):
+        data = [
+            [Paragraph(str(k), styles["label"]),
+             Paragraph(str(v), styles["cell"])]
+            for k, v in pairs
+        ]
+        t = Table(data, colWidths=[2.2 * inch, None])
+        t.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#f0f4ff")),
+            ("GRID",       (0, 0), (-1, -1), 0.4, colors.HexColor("#dde4f0")),
+            ("VALIGN",     (0, 0), (-1, -1), "TOP"),
+            ("ROWBACKGROUNDS", (1, 0), (1, -1),
+             [colors.white, colors.HexColor("#f8f9fa")]),
+            ("TOPPADDING",    (0, 0), (-1, -1), 5),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+            ("LEFTPADDING",   (0, 0), (-1, -1), 6),
+            ("RIGHTPADDING",  (0, 0), (-1, -1), 6),
+        ]))
+        return t
 
     report = build_report_data(
         audit_results,

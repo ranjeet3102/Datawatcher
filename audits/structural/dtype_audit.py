@@ -21,6 +21,8 @@ class DtypeAudit(BaseAudit):
         "bool",
         "boolean",
         "object",
+        "str",      # pandas 2.x native string dtype (future.infer_string=True)
+        "string",   # pd.StringDtype() / nullable string dtype
         "datetime64[ns]"
     }
 

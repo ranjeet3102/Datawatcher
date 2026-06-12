@@ -174,7 +174,7 @@ def try_boolean_conversion(
     series: pd.Series
 ) -> pd.Series:
 
-    if not pd.api.types.is_object_dtype(series):
+    if not pd.api.types.is_string_dtype(series):
 
         return series
 
@@ -202,9 +202,8 @@ def try_boolean_conversion(
 def clean_empty_strings(
     series: pd.Series
 ) -> pd.Series:
-    
 
-    if not pd.api.types.is_object_dtype(series):
+    if not pd.api.types.is_string_dtype(series):
 
         return series
 

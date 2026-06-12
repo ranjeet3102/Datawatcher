@@ -1,5 +1,8 @@
+from types import SimpleNamespace
+
+
 class AuditEngine:
- 
+
     def __init__(
         self,
         registry
@@ -30,10 +33,17 @@ class AuditEngine:
 
             except Exception as e:
 
-                results.append({
-                    "audit_name": audit.audit_name,
-                    "status": "failed",
-                    "error": str(e)
-                })
+                # Use SimpleNamespace so attribute access (result.category,
+                # result.audit_name, etc.) works the same as a real result object.
+                results.append(
+                    SimpleNamespace(
+                        audit_name=audit.audit_name,
+                        category="error",
+                        passed=False,
+                        severity="critical",
+                        findings={"error": str(e)},
+                        status="failed",
+                    )
+                )
 
         return results

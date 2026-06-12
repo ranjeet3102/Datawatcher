@@ -42,6 +42,7 @@ class AuditEngine:
                         passed=False,
                         severity="critical",
                         findings={"error": str(e)},
+                        recommendations=[],
                         status="failed",
                     )
                 )

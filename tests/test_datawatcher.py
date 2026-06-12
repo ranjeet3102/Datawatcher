@@ -189,6 +189,7 @@ class TestAuditEngine:
         assert hasattr(r, "passed")
         assert hasattr(r, "severity")
         assert hasattr(r, "findings")
+        assert hasattr(r, "recommendations")
         assert r.passed is False
         assert "error" in r.findings
 

@@ -2,10 +2,12 @@ README.md
 __init__.py
 _version.py
 api.py
+main.py
 pyproject.toml
 ./__init__.py
 ./_version.py
 ./api.py
+./main.py
 audits/__init__.py
 audits/categorical/__init__.py
 audits/categorical/category_frequency_audit.py

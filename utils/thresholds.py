@@ -5,7 +5,7 @@ MISSING_VALUE_THRESHOLDS = {
 
 DUPLICATE_THRESHOLDS = {
     "low": 0.5,
-    "medium": 5    
+    "medium": 5   
 }
 
 CONSTANT_FEATURE_THRESHOLDS = {

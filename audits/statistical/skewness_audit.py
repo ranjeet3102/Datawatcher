@@ -53,7 +53,6 @@ class SkewnessAudit(BaseAudit):
                 .dropna()
             )
 
-            # Skip binary / low-cardinality numeric columns
             if (
                 series.nunique()
                 <= 2
@@ -108,7 +107,6 @@ class SkewnessAudit(BaseAudit):
                 skewed_features
         }
 
-        # Statistical audits are observational
         passed = True
 
         severity = calculate_severity(

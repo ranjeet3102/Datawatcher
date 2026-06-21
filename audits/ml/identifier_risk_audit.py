@@ -28,7 +28,20 @@ IDENTIFIER_KEYWORDS = [
     "transactionid",
     "orderid",
     "email",
-    "phone"
+    "phone",
+    "uuid",
+    "guid",
+    "hash",
+    "ssn",
+    "socialsecurity",
+    "zipcode",
+    "postcode",
+    "address",
+    "ipaddress",
+    "deviceid",
+    "sessionid",
+    "token",
+    "key"
 ]
 
 
@@ -58,6 +71,8 @@ class IdentifierRiskAudit(BaseAudit):
 
             risk_score = 0
 
+            reasons = []
+
             column_lower = (
                 column.lower()
             )
@@ -68,6 +83,10 @@ class IdentifierRiskAudit(BaseAudit):
             ):
 
                 risk_score += 1
+
+                reasons.append(
+                    "semantic type is 'identifier'"
+                )
 
             unique_values = int(
                 df[column].nunique(
@@ -89,6 +108,11 @@ class IdentifierRiskAudit(BaseAudit):
 
                 risk_score += 1
 
+                reasons.append(
+                    f"high cardinality ratio "
+                    f"({round(cardinality_ratio, 4):.2%} unique values)"
+                )
+
             if any(
                 keyword in column_lower
                 for keyword in
@@ -96,6 +120,10 @@ class IdentifierRiskAudit(BaseAudit):
             ):
 
                 risk_score += 1
+
+                reasons.append(
+                    "column name matches identifier keyword"
+                )
 
             if risk_score >= 2:
 
@@ -105,6 +133,9 @@ class IdentifierRiskAudit(BaseAudit):
 
                     "risk_score":
                         risk_score,
+
+                    "reasons":
+                        reasons,
 
                     "cardinality_ratio":
                         round(
@@ -121,6 +152,9 @@ class IdentifierRiskAudit(BaseAudit):
 
             "identifier_risk_count":
                 risk_count,
+
+            "identifier_risk_names":
+                list(risk_features.keys()),
 
             "identifier_risk_features":
                 risk_features

@@ -33,8 +33,6 @@ class AuditEngine:
 
             except Exception as e:
 
-                # Use SimpleNamespace so attribute access (result.category,
-                # result.audit_name, etc.) works the same as a real result object.
                 results.append(
                     SimpleNamespace(
                         audit_name=audit.audit_name,

@@ -2,6 +2,7 @@
 
 **Production-grade dataset auditing and ML readiness scoring library.**
 
+[![PyPI version](https://img.shields.io/pypi/v/datawatcher-ml.svg)](https://pypi.org/project/datawatcher-ml/)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -12,13 +13,13 @@ DataWatcher runs a comprehensive battery of **22+ audits** across your dataset �
 ## Installation
 
 ```bash
-pip install datawatcher
+pip install datawatcher-ml
 ```
 
 For PDF report export support:
 
 ```bash
-pip install "datawatcher[pdf]"
+pip install "datawatcher-ml[pdf]"
 ```
 
 ---
@@ -146,7 +147,7 @@ datawatcher audit run data.csv --target label --export-html --export-pdf --expor
 | Audit | Threshold | Source |
 |---|---|---|
 | `cardinality_audit` | > 30% unique values | Industry ML best practice |
-| `identifier_risk_audit` | > 90% unique values | GDPR / ML risk |
+| `identifier_risk_audit` | > 90% unique values + keyword match + semantic type | GDPR / ML risk |
 | `target_validation_audit` | Target column validity | — |
 | `class_imbalance_audit` | Majority class > 75% | Japkowicz & Stephen (2002) |
 | `leakage_audit` | \|Pearson r\| > 0.90 with target | Industry standard |
@@ -236,6 +237,21 @@ results = engine.run(dataset, context={"target": "label"})
     }
 }
 ```
+
+---
+
+## What's New
+
+### v1.0.1
+- **`identifier_risk_audit`** — Each flagged column now includes a `reasons` list explaining exactly why it was flagged (e.g. `"high cardinality ratio"`, `"column name matches identifier keyword"`, `"semantic type is 'identifier'"`)
+- **`identifier_risk_audit`** — Findings now include `identifier_risk_names` — a plain list of flagged column names for quick inspection
+- **`identifier_risk_audit`** — Expanded identifier keyword detection to cover: `uuid`, `guid`, `hash`, `ssn`, `socialsecurity`, `zipcode`, `postcode`, `address`, `ipaddress`, `deviceid`, `sessionid`, `token`, `key`
+
+### v1.0.0
+- Initial public release with 22+ audits across structural, quality, statistical, categorical, and ML categories
+- ML Readiness Score (0–100) with grade and penalty breakdown
+- Domain plugins: `finance`, `healthcare`, `timeseries`
+- CLI support with HTML, PDF, and JSON report export
 
 ---
 

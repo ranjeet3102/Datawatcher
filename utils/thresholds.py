@@ -102,7 +102,7 @@ IDENTIFIER_RISK_COUNT_THRESHOLDS = {
 }
 
 CLASS_IMBALANCE_THRESHOLDS = {
-    "dominance_ratio": 75.0   
+    "dominance_ratio": 60.0   
 }
 
 CLASS_IMBALANCE_COUNT_THRESHOLDS = {

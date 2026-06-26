@@ -159,6 +159,9 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+# Website (has its own separate repo: datawatcher_website)
+website/
+
 # OS Generated
 .DS_Store
 .DS_Store?

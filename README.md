@@ -5,8 +5,11 @@
 [![PyPI version](https://img.shields.io/pypi/v/datawatcher-ml.svg)](https://pypi.org/project/datawatcher-ml/)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Docs](https://img.shields.io/badge/docs-datawatcher-blue?logo=vercel)](https://datawatcher-website.vercel.app/)
 
 DataWatcher runs a comprehensive battery of **22+ audits** across your dataset — checking structure, data quality, statistical properties, categorical features, and ML-specific risks — then produces an overall **ML Readiness Score (0–100)** and a prioritized **Risk Summary**.
+
+📖 **[Full Documentation & Guide → datawatcher-website.vercel.app](https://datawatcher-website.vercel.app/)**
 
 ---
 

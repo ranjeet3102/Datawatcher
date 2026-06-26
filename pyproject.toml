@@ -48,7 +48,8 @@ dev = [
 datawatcher = "datawatcher.cli.app:app"
 
 [project.urls]
-Homepage = "https://github.com/ranjeet3102/datawatcher"
+Homepage = "https://datawatcher-website.vercel.app/"
+Documentation = "https://datawatcher-website.vercel.app/"
 Repository = "https://github.com/ranjeet3102/datawatcher"
 Issues = "https://github.com/ranjeet3102/datawatcher/issues"
 
